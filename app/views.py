@@ -4,9 +4,13 @@ Jinja2 Documentation:    https://jinja.palletsprojects.com/
 Werkzeug Documentation:  https://werkzeug.palletsprojects.com/
 This file contains the routes for your application.
 """
-
-from app import app
-from flask import render_template, request, redirect, url_for
+import os
+from app import app, db
+from flask import render_template, request, redirect, url_for, flash, abort, send_from_directory
+from werkzeug.utils import secure_filename
+from app.forms import create_prop
+from app.models import sales
+from sqlalchemy import func
 
 
 ###
@@ -23,6 +27,66 @@ def home():
 def about():
     """Render the website's about page."""
     return render_template('about.html', name="Mary Jane")
+
+
+#created
+@app.route('/properties/create/', methods=['POST', 'GET'])
+def propc():
+    cprop = create_prop()
+    if cprop.validate_on_submit():
+        title =cprop.title.data
+        bedrooms = cprop.bedrooms.data
+        bathrooms = cprop.bathrooms.data
+        location = cprop.location.data
+        ptype = cprop.ptype.data
+        price = cprop.price.data
+        disc = cprop.disc.data
+        photo = cprop.photo.data
+
+        filename = photo.filename
+        photo.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+
+        id = id_get()
+        if id:
+            id= id + 1
+        else:
+            id = 1
+
+        db.session.add(id,title,bedrooms,bathrooms,location,ptype,price,disc,filename)
+
+        flash('Property Added', 'success')
+        return redirect(url_for('plist'))
+
+    return render_template('add_property.html',form = cprop)
+
+def id_get():
+    return int(db.session.query(func.max(sales.propertyid)).scalar())
+
+#created
+@app.route('/properties', methods = ['GET', 'POST'])
+def plist():
+
+    total_props = db.session.execute(db.select(sales)).scalar()
+    if total_props:
+        return render_template('propertylist.html',props = total_props)
+
+    return render_template('propertylist.html')
+
+#helps plist() to retrieve images
+def get_pic(filename):
+
+    return send_from_directory(os.path.join(os.getcwd(),
+                                            app.config['UPLOAD_FOLDER']), filename)
+
+
+
+#created
+@app.route('/properties/<propertyid>', methods = ['GET'])
+def propview(propertyid):
+    a_prop =  db.session.execute(db.select(sales).filter_by(propertyid = propertyid)).scalar()
+    title,bedrooms,bathrooms,location,ptype,price,disc,filename = a_prop
+    pic = get_pic(filename)
+    return render_template('property.html', shown = a_prop, pic = pic )
 
 
 ###

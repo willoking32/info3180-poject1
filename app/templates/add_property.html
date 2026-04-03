@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+{% include 'flash_messages.html' %}
+
+<form action="{{ url_for('propc') }}" method = 'post' enctype="multipart/form-data">
+  {{ form.csrf_token }}
+  <div class="uploadf">
+    {#{form.pic.label()}#}
+    {#{form.pic(class='')}#}
+  </div>
+  
+  {# Add the file upload field as you learnt for Flask-WTF #}
+
+  <button class="btn btn-primary">Upload file</button>
+</form>
+
+{%endblock%}
