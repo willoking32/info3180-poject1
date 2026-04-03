@@ -6,14 +6,56 @@
 
 <form action="{{ url_for('propc') }}" method = 'post' enctype="multipart/form-data">
   {{ form.csrf_token }}
-  <div class="uploadf">
-    {#{form.pic.label()}#}
-    {#{form.pic(class='')}#}
-  </div>
+    <div class=create_card>
+        <div class="create_top">
+            {{form.title.label()}}
+            {{form.title}}
+
+            {{form.disc.label()}}
+            {{form.disc}}
+        </div>
+        <div class = 'create_bott'>
+
+            <div class = 'bott'>
+                {{form.bedrooms.label()}}
+                {{form.bedrooms}}
+            </div>
+
+            <div class = 'bott'>
+                {{form.bathrooms.label()}}
+                {{form.bathrooms}}
+            </div>
+
+            <div class = 'bott'>
+                {{form.price.label()}}
+                {{form.price}}
+            </div>
+            
+            <div class = 'bott'>
+                {{form.ptype.label()}}
+                {{form.ptype}}
+            </div>
+            
+            <div class = 'bott'>
+                {{form.location.label()}}
+                {{form.location}}
+            </div>
+            
+
+        </div>
+
+        <div class = 'buttons'>
+            {{form.photo.label()}}
+            {{form.photo(class='')}}
+        </div>
+        
+        
+        <button class="btn btn-primary">Upload file</button>
+    </div>
   
   {# Add the file upload field as you learnt for Flask-WTF #}
 
-  <button class="btn btn-primary">Upload file</button>
+  
 </form>
 
 {%endblock%}

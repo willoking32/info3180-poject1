@@ -27,7 +27,7 @@ class sales(db.Model):
         self.ptype = ptype
         self.price = price
         self.photo = photo
-        self.discription = disc
+        self.disc = disc
         
 
     def is_authenticated(self):

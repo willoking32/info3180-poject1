@@ -30,7 +30,8 @@ def about():
 
 
 #created
-@app.route('/properties/create/', methods=['POST', 'GET'])
+#error 405 method not allowed if 'POST' only
+@app.route('/properties/create', methods=['POST', 'GET'])
 def propc():
     cprop = create_prop()
     if cprop.validate_on_submit():
@@ -43,7 +44,7 @@ def propc():
         disc = cprop.disc.data
         photo = cprop.photo.data
 
-        filename = photo.filename
+        filename = secure_filename(photo.filename)
         photo.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
 
         id = id_get()
@@ -52,29 +53,41 @@ def propc():
         else:
             id = 1
 
-        db.session.add(id,title,bedrooms,bathrooms,location,ptype,price,disc,filename)
+        prop = sales(id,title,bedrooms,bathrooms,location,price,ptype,filename,disc)
+
+        db.session.add(prop)
+        db.session.commit()
 
         flash('Property Added', 'success')
         return redirect(url_for('plist'))
 
     return render_template('add_property.html',form = cprop)
 
+
 def id_get():
-    return int(db.session.query(func.max(sales.propertyid)).scalar())
+    return db.session.query(func.max(sales.propertyid)).scalar()
+
 
 #created
 @app.route('/properties', methods = ['GET', 'POST'])
 def plist():
+    i = 1
+    o = id_get()
+    total_props =db.session.execute(db.select(sales.propertyid,sales.title,
+                                            sales.bedrooms,sales.bathrooms,
+                                            sales.location,sales.ptype,sales.price,
+                                            sales.disc,sales.photo).order_by(sales.propertyid)).fetchall()
+        
+    #if total_props:
+    #flash(total_props)
+    return render_template('propertylist.html',props = total_props)
 
-    total_props = db.session.execute(db.select(sales)).scalar()
-    if total_props:
-        return render_template('propertylist.html',props = total_props)
+    #return render_template('propertylist.html')
 
-    return render_template('propertylist.html')
 
 #helps plist() to retrieve images
+@app.route('/getpic/<filename>')
 def get_pic(filename):
-
     return send_from_directory(os.path.join(os.getcwd(),
                                             app.config['UPLOAD_FOLDER']), filename)
 
@@ -83,10 +96,13 @@ def get_pic(filename):
 #created
 @app.route('/properties/<propertyid>', methods = ['GET'])
 def propview(propertyid):
-    a_prop =  db.session.execute(db.select(sales).filter_by(propertyid = propertyid)).scalar()
-    title,bedrooms,bathrooms,location,ptype,price,disc,filename = a_prop
-    pic = get_pic(filename)
-    return render_template('property.html', shown = a_prop, pic = pic )
+    a_prop =  db.session.execute(db.select(sales.propertyid,sales.title,
+                                            sales.bedrooms,sales.bathrooms,
+                                            sales.location,sales.ptype,sales.price,
+                                            sales.disc,sales.photo).filter_by(propertyid = propertyid)).fetchall()
+    flash(a_prop)
+
+    return render_template('property.html', shown = a_prop)
 
 
 ###
