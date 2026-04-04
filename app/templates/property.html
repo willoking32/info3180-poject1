@@ -4,13 +4,33 @@
 
 {% include 'flash_messages.html' %}
 <div class="propertycard">
-    <img src="{{url_for('get_pic',filename = shown[8])}}" alt="Image not found.">
     <div>
-
+        <img class = 'pimage' src="{{url_for('get_pic',filename = shown[8])}}" alt="Image not found.">
     </div>
+     
     <div>
-
+        <h5 class = 'title'>{{shown[1]}}</h5>
+        <div class="content">
+            <div class = "moneystyle">
+                <p class = 'money'id='money'>{{shown[6]}}</p>
+            </div>
+            <div class = "typestyle">
+                <p class = 'type'>{{shown[5]}}</p>
+            </div>
+        </div>
+        <p class = 'disc'>{{shown[7]}}</p>
+        <div class="content">
+            <div>
+                <p class = 'bedroom'>{{shown[2]}} bedroom(s)</p>
+            </div>
+            <div>
+                <p class = bathroom>{{shown[3]}} bathroom(s)</p>
+            </div>
+        </div>
+        <p class = 'location' id = 'loc'>{{shown[4]}}</p>
+        <button class = email>Email Realtor</button>
     </div>
+    
 </div>
 
 {%endblock%}

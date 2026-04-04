@@ -100,7 +100,7 @@ def propview(propertyid):
                                             sales.bedrooms,sales.bathrooms,
                                             sales.location,sales.ptype,sales.price,
                                             sales.disc,sales.photo).filter_by(propertyid = propertyid)).fetchall()
-    flash(a_prop[0])
+    #flash(a_prop[0])
 
     return render_template('property.html', shown = a_prop[0])
 
